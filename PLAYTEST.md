@@ -17,8 +17,8 @@ Your original DQIX Enhanced install and existing save are not replaced. The new 
 1. Find `DQIX-Coop-Playtest/game` and make sure `dqix.exe` exists.
 2. Copy a **disposable**, normal, early level-1 **Minstrel** save there as `dqix.sav` (not an already-modified Mage or Warrior save). Preserve the original save elsewhere.
 3. Launch `game/dqix.exe` or upstream's launch shortcut (if it needs a companion launcher, use upstream's `game/play.bat`).
-4. Open **Game > Starting vocation (fresh saves only)** (also shown in the controller in-game menu).
-5. Choose **Warrior, Martial Artist, Mage, Priest, Thief, or Minstrel**.
+4. When an eligible early Minstrel adventure is loaded, a **six-choice starting-vocation dialog should appear automatically**.
+5. Choose **Warrior, Martial Artist, Mage, Priest, Thief, or Minstrel**. You can also open **Game > Starting vocation (fresh saves only)** later (including from the controller in-game menu).
 6. Confirm; the game backs up the test save, writes the selected vocation, and restarts automatically.
 7. Inspect vocation/attributes/spells and save/reload persistence. If it refuses the save, use the original early Minstrel baseline, not the progressed Mage test save.
 
