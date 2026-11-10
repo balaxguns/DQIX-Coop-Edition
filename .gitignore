@@ -1,0 +1,26 @@
+# Local game material – never commit
+*.nds
+*.sav
+*.dsv
+*.cia
+*.3ds
+rom/
+ROM/
+extract/
+baserom_*
+game/
+build/
+dist/
+out/
+*.exe
+*.dll
+*.pdb
+*.zip
+*.7z
+*.log
+# Developer environment
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+.env
