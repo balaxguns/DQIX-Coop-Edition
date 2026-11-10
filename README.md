@@ -20,6 +20,12 @@ The character should begin at **level 1** using the original game's accurate voc
 
 The upstream [DQIX Enhanced](https://github.com/sackchief/dqix-enhanced) project documents original-style co-op over the internet for up to four players. This does **not** automatically provide coordinated campaign story progression or co-op at the beginning of a brand-new save. We'll treat testing remote multiplayer and changing campaign gates as distinct tasks.
 
+## Character-creation integration (experimental feature branch)
+
+The [new-character vocation branch](https://github.com/balaxguns/DQIX-Coop-Edition/tree/feature/native-starting-vocation) now introduces an **added PC creation-time vocation choice** before the original avatar appearance editor. Warrior, Martial Artist, Mage, Priest, Thief, and Minstrel appear when you start a **blank new game**. It remembers the chosen vocation while the original Guardian prologue runs and automatically applies it upon a verified eligible starting-adventurer save.
+
+This is not yet an added field **inside** the original Nintendo DS appearance customization screen. The full Windows gameplay flow is unverified, although automated integration tests and C syntax checks pass. See [playtest instructions](PLAYTEST.md) before testing in a separate installation.
+
 ## Usable experimental tools
 
 - [Double-click Windows launcher](Launch%20Vocation%20Selector.bat) and [vocation selector (Python/Tkinter)](tools/vocation_selector_gui.py) — creates a **separate** test save from a suitable early-game save and never replaces the original automatically. The code is a local utility, not part of the game UI.

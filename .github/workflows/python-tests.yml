@@ -24,3 +24,36 @@ jobs:
         run: python -m compileall -q tools tests
       - name: Run synthetic-save unit tests
         run: python -m unittest discover -s tests -v
+
+  native-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile C hook with warnings as errors
+        run: cc -std=c11 -Wall -Wextra -Werror -pedantic tests/test_native_vocation.c -o /tmp/test_native_vocation
+      - name: Run synthetic-save tests
+        run: /tmp/test_native_vocation
+
+  upstream-integration-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: sackchief/dqix-enhanced
+          ref: 86ff9b1ce6128a52f1e83d110b5c893043df5159
+          path: upstream
+      - name: Install runtime vocation hook and game menu
+        run: |
+          python tools/install_native_hook.py upstream
+          python tools/install_game_menu.py upstream
+          python tools/install_creation_flow.py upstream
+          python tools/install_game_menu.py upstream
+      - name: Install SDL2 headers
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libsdl2-dev
+      - name: Check generated C source syntax
+        run: |
+          cc -std=gnu11 -fsyntax-only -Iupstream/runtime upstream/runtime/dqix_vocation.c
+          cc -std=gnu11 -fsyntax-only -Iupstream/runtime upstream/runtime/card.c
+          cc -std=gnu11 -fsyntax-only -Iupstream/runtime $(sdl2-config --cflags) upstream/runtime/frontend_sdl.c
+          cc -std=gnu11 -fsyntax-only -Iupstream/runtime $(sdl2-config --cflags) upstream/runtime/menu_items.c
