@@ -1,12 +1,12 @@
 # Manual test matrix
 
-Statuses: NOT RUN / PASS / FAIL / BLOCKED. All tests begin at NOT RUN.
+Statuses: NOT RUN / PARTIAL / PASS / FAIL / BLOCKED. All tests begin at NOT RUN.
 
 | ID | Test | Status |
 | --- | --- | --- |
 | C01 | Create Warrior at level 1; verify stats, equipment, skills | NOT RUN |
 | C02 | Create Martial Artist at level 1; verify stats, equipment, skills | NOT RUN |
-| C03 | Create Mage at level 1; verify stats, equipment, spells | NOT RUN |
+| C03 | Create Mage at level 1; verify stats, equipment, spells | PARTIAL — user confirmed Mage vocation displays in game; stats/equipment/spells not yet verified |
 | C04 | Create Priest at level 1; verify stats, equipment, spells | NOT RUN |
 | C05 | Create Thief at level 1; verify stats, equipment, skills | NOT RUN |
 | C06 | Create Minstrel at level 1; compare original baseline | NOT RUN |
@@ -20,3 +20,7 @@ Statuses: NOT RUN / PASS / FAIL / BLOCKED. All tests begin at NOT RUN.
 | N04 | Document original guest story-progression restrictions | NOT RUN |
 
 Log game region, upstream commit, mod commit, build environment, test save type, and any failure details before marking PASS.
+
+## Playtest report — 2026-11-10
+
+User confirmed that an experimental Mage-modified `dqix.sav` loads and displays the hero as **Mage** in the game. This establishes **vocation field recognition only**; it does not yet establish correct class stats, spells, equipment restrictions, level-up behavior, save/reload persistence, or an in-game creation UI. All those remain open. No proprietary save or ROM was committed.
