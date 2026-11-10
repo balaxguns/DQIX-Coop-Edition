@@ -197,6 +197,10 @@ def change_source(contents):
     front = front[:start] + FRONTEND_CODE + front[end:]
     front = front.replace(FRAME_CALL, "    coop_creation_tick();", 1)
     front = front.replace(
+        "void frontend_init(int argc, char** argv) {",
+        "void dqix_coop_creation_boot_complete(void);\n"
+        "void frontend_init(int argc, char** argv) {", 1)
+    front = front.replace(
         BOOT_POINT,
         BOOT_POINT + "\n    /* Resolve any pending character-creation choice before DS boot. */\n"
         "    backup_flush();\n"
