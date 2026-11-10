@@ -59,8 +59,8 @@ int dqix_coop_creation_pending(void) {
 int dqix_coop_creation_set(const char* choice) {
     if (choice && !strcmp(choice, "minstrel")) {
         /* Explicit original-class choice: cancel any previous pending choice. */
-        remove(COOP_PENDING_FILE);
-        return 1;
+        if (!dqix_coop_creation_pending()) return 1;
+        return remove(COOP_PENDING_FILE) == 0;
     }
     if (!coop_vocation_name(choice)) return 0;
     FILE* f = fopen(COOP_PENDING_FILE, "wb");
