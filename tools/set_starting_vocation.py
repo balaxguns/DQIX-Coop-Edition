@@ -52,11 +52,24 @@ def patch_save(raw, vocation):
         raise SaveError('Unsupported starting vocation')
 
     data = bytearray(raw)
-    # Validate both slots before doing any work, as the original editor does.
+    # A freshly initialized but unplayed file may contain an empty slot with
+    # intentionally unwritten CRCs. Explain that case before validating CRCs;
+    # never "repair" empty or genuinely damaged saves in this tool.
     for i in (0, 1):
         base = i * SLOT_SIZE
-        if not checksums_ok(data[base:base + SLOT_SIZE]):
-            raise SaveError(f'Save slot {i} has invalid checksums; no changes made')
+        buf = data[base:base + SLOT_SIZE]
+        if not (buf[SAVE_EXISTS] & 1):
+            raise SaveError(
+                f'Save slot {i} contains no started character. '
+                'Select a copy of your earlier level-1 Minstrel save '
+                '(not a blank new-game save or your already-modified Mage save). '
+                'No changes made.'
+            )
+        if not checksums_ok(buf):
+            raise SaveError(
+                f'Save slot {i} has invalid checksums in an occupied slot. '
+                'Choose a different backed-up save; no changes made.'
+            )
 
     # Only a baseline from the mandatory early fight is supported.
     # Both save slots must be consistent; otherwise refuse to guess which
