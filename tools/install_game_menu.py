@@ -158,7 +158,7 @@ def changes(existing):
     # Show a one-time native six-option dialog on the first eligible boot.
     frontend = frontend.replace(
         "void frontend_frame(void) {",
-        "void frontend_frame(void) {\\n    coop_vocation_prompt_once();", 1)
+        "void frontend_frame(void) {\n    coop_vocation_prompt_once();", 1)
     frontend = frontend.replace("    case MI_SAVE_EXPORT: save_export(); break;",
                                 "    case MI_COOP_VOC0: case MI_COOP_VOC1: case MI_COOP_VOC2:\n"
                                 "    case MI_COOP_VOC3: case MI_COOP_VOC4: case MI_COOP_VOC5:\n"
