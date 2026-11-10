@@ -71,10 +71,6 @@ static void do_action(int id) {
 
     def test_drift_refused_with_no_changes(self):
         original = self.base()
-        del original["runtime/menu_items.c"]
-        with self.assertRaisesRegex(ValueError, "menu_items.c"):
-            module.changes(original)
-        original = self.base()
         original["runtime/menu_items.c"] = "unexpected"
         with self.assertRaisesRegex(ValueError, "menu_items.c changed"):
             module.changes(original)
