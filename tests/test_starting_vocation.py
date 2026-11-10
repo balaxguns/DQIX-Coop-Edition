@@ -48,6 +48,24 @@ class TestSavePatch(unittest.TestCase):
                 self.assertEqual(int.from_bytes(altered[start + local_hero + mod.EXPS + 24:
                                                         start + local_hero + mod.EXPS + 28], 'little'), 7)
 
+    def test_blank_initialized_slots_have_clear_error(self):
+        blank = bytearray(fake_save())
+        for slot in (0, 1):
+            base = slot * mod.SLOT_SIZE
+            blank[base + mod.SAVE_EXISTS] = 0
+            blank[base + mod.STANDBY_COUNT] = 255
+            blank[base + mod.PARTY_COUNT] = 255
+            # Blank slots commonly do not have all valid CRCs.
+            blank[base + 36:base + 40] = b'\\x00' * 4
+        with self.assertRaisesRegex(mod.SaveError, 'contains no started character'):
+            mod.patch_save(bytes(blank), 'mage')
+
+    def test_occupied_corrupt_slot_still_rejected(self):
+        broken = bytearray(fake_save())
+        broken[mod.CHARACTER_OFFSET + 18] ^= 1
+        with self.assertRaisesRegex(mod.SaveError, 'invalid checksums in an occupied slot'):
+            mod.patch_save(bytes(broken), 'mage')
+
     def test_zero_exp_still_supported(self):
         self.assertEqual(mod.patch_save(fake_save(exp=0), 'mage')[1932], 3)
 
