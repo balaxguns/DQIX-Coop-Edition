@@ -37,12 +37,25 @@ int dqix_coop_apply_menu_start_vocation(const char* requested) {
     }
     return result;
 }
+/* Non-destructive eligibility probe used once after boot by the selector.
+ * Run exactly the same validator against an in-memory COPY, never the save.
+ */
+int dqix_coop_start_vocation_eligible(void) {
+    if (g_backup_size != 65536u) return 0;
+    unsigned char* temp = (unsigned char*)malloc(g_backup_size);
+    if (!temp) return 0;
+    memcpy(temp, g_backup, g_backup_size);
+    int result = dqix_apply_start_vocation(temp, g_backup_size, "mage");
+    free(temp);
+    return result == 1;
+}
 """
 FRONTEND = """/* DQIX-Coop: menu option is available through the Windows menu bar and
  * the SDL in-game menu. This operates on an early saved Minstrel, not
  * on the Celestial/Guardian storyline or advanced vocation unlocks.
  */
 """ + DECL + """
+int dqix_coop_start_vocation_eligible(void);
 static void coop_start_vocation_action(int id) {
     static const char* choices[6] = {
         "warrior", "martial-artist", "mage", "priest", "thief", "minstrel"
@@ -87,6 +100,27 @@ static void coop_start_vocation_action(int id) {
     }
     restart_with(NULL);
 }
+/* First eligible fresh Minstrel boot: show all six choices automatically.
+ * Minstrel is also a valid "continue unchanged" choice.
+ * This is shown after the Guardian story, when an actual adventurer save
+ * exists, not during the original Celestrian-only prologue.
+ */
+static void coop_vocation_prompt_once(void) {
+    static int asked;
+    if (asked || g_headless || !g_win || session_requested()) return;
+    asked = 1;
+    if (!dqix_coop_start_vocation_eligible()) return;
+    static const char* const names[6] = {
+        "Warrior", "Martial Artist", "Mage", "Priest", "Thief", "Minstrel"
+    };
+    int picked = choose("Choose starting vocation",
+        "Your new adventurer is ready. Select one of the six original "
+        "starting vocations. The game keeps its Guardian prologue; this "
+        "selection applies at Level 1. Your test save is backed up and "
+        "the game restarts when you confirm.", names, 6, 5, 5);
+    if (picked >= 0 && picked <= 4)
+        coop_start_vocation_action(MI_COOP_VOC0 + picked);
+}
 """
 
 def require_once(text, needle, name):
@@ -111,6 +145,7 @@ def changes(existing):
     require_once(frontend, "static void do_action(int id) {", "frontend_sdl.c")
     require_once(frontend, "    case MI_SAVE_EXPORT: save_export(); break;", "frontend_sdl.c")
     require_once(frontend, "static void save_backup_copy(char* out, size_t n) {", "frontend_sdl.c")
+    require_once(frontend, "void frontend_frame(void) {", "frontend_sdl.c")
 
     card = card.replace("const char* backup_path(void) { return g_backup_path; }",
                         CARD + "\nconst char* backup_path(void) { return g_backup_path; }", 1)
@@ -120,6 +155,10 @@ def changes(existing):
     # Functions used by the action are defined above do_action.
     frontend = frontend.replace("static void do_action(int id) {",
                                 BEGIN + "\n" + FRONTEND + "\nstatic void do_action(int id) {", 1)
+    # Show a one-time native six-option dialog on the first eligible boot.
+    frontend = frontend.replace(
+        "void frontend_frame(void) {",
+        "void frontend_frame(void) {\\n    coop_vocation_prompt_once();", 1)
     frontend = frontend.replace("    case MI_SAVE_EXPORT: save_export(); break;",
                                 "    case MI_COOP_VOC0: case MI_COOP_VOC1: case MI_COOP_VOC2:\n"
                                 "    case MI_COOP_VOC3: case MI_COOP_VOC4: case MI_COOP_VOC5:\n"
