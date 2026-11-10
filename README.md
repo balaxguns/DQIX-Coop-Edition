@@ -22,7 +22,7 @@ The upstream [DQIX Enhanced](https://github.com/sackchief/dqix-enhanced) project
 
 ## Usable experimental tools
 
-- [Windows-friendly vocation selector (Python/Tkinter)](tools/vocation_selector_gui.py) — creates a **separate** test save from a suitable early-game save and never replaces the original automatically. The code is a local utility, not part of the game UI.
+- [Double-click Windows launcher](Launch%20Vocation%20Selector.bat) and [vocation selector (Python/Tkinter)](tools/vocation_selector_gui.py) — creates a **separate** test save from a suitable early-game save and never replaces the original automatically. The code is a local utility, not part of the game UI.
 - [Safe command-line save patcher](tools/set_starting_vocation.py) — underlying prototype; only supports specific early Minstrel saves.
 - [Synthetic-save unit tests](tests/test_starting_vocation.py) and [CI workflow](.github/workflows/python-tests.yml).
 - [Experimental save test details](docs/EXPERIMENTAL_VOCATION_TEST.md).
