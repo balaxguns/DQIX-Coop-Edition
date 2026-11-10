@@ -47,6 +47,7 @@ jobs:
         run: |
           python tools/install_native_hook.py upstream
           python tools/install_game_menu.py upstream
+          python tools/install_creation_flow.py upstream
           python tools/install_game_menu.py upstream
       - name: Install SDL2 headers
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libsdl2-dev
