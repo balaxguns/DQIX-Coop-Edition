@@ -27,11 +27,11 @@ def preview(raw):
     lines = []
     for index in (0, 1):
         data = raw[index * SLOT_SIZE:(index + 1) * SLOT_SIZE]
-        if not checksums_ok(data):
-            lines.append(f"Slot {index}: bad checksum")
+        if not (data[SAVE_EXISTS] & 1):
+            lines.append(f"Slot {index}: empty — no started character; choose your earlier Minstrel save")
             continue
-        if not data[SAVE_EXISTS] & 1:
-            lines.append(f"Slot {index}: empty")
+        if not checksums_ok(data):
+            lines.append(f"Slot {index}: invalid checksum (occupied save); use a different backup")
             continue
         standby = data[STANDBY_COUNT]
         party = data[PARTY_COUNT]
