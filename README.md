@@ -2,7 +2,7 @@
 
 A community modification project for **Dragon Quest IX: Sentinels of the Starry Skies**, focused on six selectable starting vocations and compatibility with online multiplayer.
 
-> **Status: research and scaffolding.** No playable mod, vocation-selection patch, installer, or multiplayer modification has been implemented or tested in this repository yet.
+> **Status: experimental prototype.** A standalone save-file vocation selector has been implemented, and a Mage save has been tested in the game with appropriate-looking stats, Frizz, and Frizz persistence after reload. **The requested in-game character-creation screen has not been implemented.** No new multiplayer logic has been implemented.
 
 ## What we want to change
 
@@ -19,6 +19,13 @@ The character should begin at **level 1** using the original game's accurate voc
 ## Playing online
 
 The upstream [DQIX Enhanced](https://github.com/sackchief/dqix-enhanced) project documents original-style co-op over the internet for up to four players. This does **not** automatically provide coordinated campaign story progression or co-op at the beginning of a brand-new save. We'll treat testing remote multiplayer and changing campaign gates as distinct tasks.
+
+## Usable experimental tools
+
+- [Windows-friendly vocation selector (Python/Tkinter)](tools/vocation_selector_gui.py) — creates a **separate** test save from a suitable early-game save and never replaces the original automatically. The code is a local utility, not part of the game UI.
+- [Safe command-line save patcher](tools/set_starting_vocation.py) — underlying prototype; only supports specific early Minstrel saves.
+- [Synthetic-save unit tests](tests/test_starting_vocation.py) and [CI workflow](.github/workflows/python-tests.yml).
+- [Experimental save test details](docs/EXPERIMENTAL_VOCATION_TEST.md).
 
 ## Read the project documents
 
