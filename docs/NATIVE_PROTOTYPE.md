@@ -1,4 +1,6 @@
-# Native vocation proof of concept (experimental)
+# Native vocation implementation notes (experimental)
+
+> **Current branch update:** New characters now get a six-choice vocation prompt when launching a blank test game, **before the original appearance editor**. It remembers the choice across the mandatory Guardian prologue and applies it on an eligible starting-adventurer save. Previous sections describing a prompt after loading a Minstrel save refer to the older prototype and are superseded by [PLAYTEST.md](../PLAYTEST.md). The original Nintendo DS appearance editor itself has not been modified. End-to-end gameplay remains unverified.
 
 This branch introduces **actual C code integrated into DQIX Enhanced's save-chip startup path**. This is a step beyond the Python save editor, but **not** the final character-creation menu and **not yet verified on Windows**.
 
