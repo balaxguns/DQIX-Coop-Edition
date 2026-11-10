@@ -106,7 +106,7 @@ def main(argv=None):
             raise SaveError('Refusing to overwrite the input save')
         if destination.exists():
             raise SaveError('Output already exists; refusing to overwrite it')
-        modified = patch_save(args.input.read_bytes(), args.vocation, args.slot)
+        modified = patch_save(args.input.read_bytes(), args.vocation)
         with destination.open('xb') as f:
             f.write(modified)
     except (OSError, SaveError) as error:
