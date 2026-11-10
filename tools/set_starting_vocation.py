@@ -43,15 +43,13 @@ def rewrite_checksums(data):
         data[offset:offset + 4] = zlib.crc32(data[start:end]).to_bytes(4, 'little')
 
 
-def patch_save(raw, vocation, slot=0):
+def patch_save(raw, vocation):
     if len(raw) != FILE_SIZE:
         raise SaveError('Expected a 65,536-byte DQIX .sav file')
     if raw[:len(MAGIC)] != MAGIC:
         raise SaveError('Save header is not DRAGON QUEST IX')
     if vocation not in VOCATIONS:
         raise SaveError('Unsupported starting vocation')
-    if slot not in (0, 1):
-        raise SaveError('Save slot must be 0 or 1')
 
     data = bytearray(raw)
     # Validate both slots before doing any work, as the original editor does.
@@ -97,7 +95,6 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input', type=Path, help='Original copied dqix.sav (never overwritten)')
     parser.add_argument('vocation', choices=sorted(VOCATIONS))
-    parser.add_argument('--slot', type=int, choices=[0, 1], default=None,\n                        help='Deprecated: both slots are safely updated together')
     parser.add_argument('--output', type=Path, help='Separate output .sav path')
     args = parser.parse_args(argv)
     destination = args.output or args.input.with_name(args.input.stem + '-' + args.vocation + '.sav')
