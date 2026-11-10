@@ -24,3 +24,12 @@ jobs:
         run: python -m compileall -q tools tests
       - name: Run synthetic-save unit tests
         run: python -m unittest discover -s tests -v
+
+  native-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile C hook with warnings as errors
+        run: cc -std=c11 -Wall -Wextra -Werror -pedantic tests/test_native_vocation.c -o /tmp/test_native_vocation
+      - name: Run synthetic-save tests
+        run: /tmp/test_native_vocation
