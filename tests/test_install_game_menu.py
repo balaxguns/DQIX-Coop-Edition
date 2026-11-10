@@ -35,6 +35,7 @@ enum {
 """,
             "runtime/frontend_sdl.c": """
 static void save_backup_copy(char* out, size_t n) { out[0] = 0; }
+void frontend_frame(void) { }
 static void do_action(int id) {
     switch (id) {
     case MI_SAVE_EXPORT: save_export(); break;
@@ -50,6 +51,9 @@ static void do_action(int id) {
                   "MI_COOP_VOC3", "MI_COOP_VOC4", "MI_COOP_VOC5"):
             self.assertIn(k, changed["runtime/menu_items.c"])
         self.assertIn("coop_start_vocation_action(id)", changed["runtime/frontend_sdl.c"])
+        self.assertIn("coop_vocation_prompt_once();", changed["runtime/frontend_sdl.c"])
+        self.assertIn("Choose starting vocation", changed["runtime/frontend_sdl.c"])
+        self.assertIn("dqix_coop_start_vocation_eligible", changed["runtime/card.c"])
         self.assertIn("save_backup_copy(kept", changed["runtime/frontend_sdl.c"])
         self.assertIn("restart_with(NULL)", changed["runtime/frontend_sdl.c"])
         self.assertIn("dqix_apply_start_vocation(g_backup", changed["runtime/card.c"])
