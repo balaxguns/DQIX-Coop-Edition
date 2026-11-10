@@ -83,6 +83,8 @@ def prepare(rom, destination, project):
                         str(destination)], check=True)
         subprocess.run([sys.executable, str(project / "tools" / "install_game_menu.py"),
                         str(destination)], check=True)
+        subprocess.run([sys.executable, str(project / "tools" / "install_creation_flow.py"),
+                        str(destination)], check=True)
         rom_dir = destination / "rom"
         rom_dir.mkdir(exist_ok=True)
         shutil.copy2(rom, rom_dir / "dqix.nds")
@@ -146,9 +148,10 @@ def main():
         messagebox.showinfo(
             "DQIX-Coop build created",
             "Your separate test game was built.\n\n"
-            "Copy an early Level 1 MINSTREL test save into this playtest "
-            "game folder as dqix.sav, keeping your original safe.\n\n"
-            "Launch the test game and choose Game > Starting vocation.")
+            "Launch the new test game with NO EXISTING SAVE to choose "
+            "your vocation before creating your new character.\n\n"
+            "The Guardian prologue remains intact; your class will apply "
+            "after the first eligible adventurer save.")
     return 0
 
 
