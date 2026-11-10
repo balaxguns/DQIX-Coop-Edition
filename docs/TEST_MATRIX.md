@@ -10,7 +10,7 @@ Statuses: NOT RUN / PARTIAL / PASS / FAIL / BLOCKED. All tests begin at NOT RUN.
 | C04 | Create Priest at level 1; verify stats, equipment, spells | NOT RUN |
 | C05 | Create Thief at level 1; verify stats, equipment, skills | NOT RUN |
 | C06 | Create Minstrel at level 1; compare original baseline | NOT RUN |
-| S01 | Save and reload each creation result | PARTIAL — Mage test save reloaded with Frizz still available; other vocations not tested |
+| G01 | Standalone selector creates a Warrior save from eligible original | PARTIAL — user confirmed selector succeeded; Warrior gameplay not tested |\n| S01 | Save and reload each creation result | PARTIAL — Mage test save reloaded with Frizz still available; other vocations not tested |
 | P01 | Level up each initial vocation normally | NOT RUN |
 | P02 | Advanced vocations stay quest-locked | NOT RUN |
 | P03 | Alltrades Abbey changing still works | NOT RUN |
@@ -32,3 +32,11 @@ User subsequently confirmed **Frizz is available** for their level-1 Mage, corre
 ## Mage persistence confirmation — 2026-11-10
 
 User reported that after saving, closing, and reopening DQIX Enhanced, the Mage character still had **Frizz**. This verifies persistence of that spell across a save/reload cycle, but the user did **not explicitly recheck the character's displayed vocation** after reopening, so a complete vocation persistence claim still needs confirmation. In-game creation UI is not yet implemented.
+
+## Standalone selector — 2026-11-10
+
+User confirmed the corrected desktop selector successfully generated a Warrior test save after empty-save checksum messaging was fixed. This is a tool-generation success only; Warrior has not yet been loaded or tested in-game.
+
+## Native runtime branch — 2026-11-10
+
+The separate experimental native C save-chip hook and test suite are on draft PR #2. GitHub Actions completed successfully for the branch, including native C compilation and synthetic save tests. This confirms source-level test behavior, **not** a working compiled DQIX executable or an in-game character-creation selection screen. The next verification step requires a build/test with a personally held local game ROM in an isolated game directory.
