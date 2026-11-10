@@ -1,55 +1,39 @@
-# Experimental starting-vocation save prototype
+# Experimental vocation-save test
 
-**Not yet the requested creation-screen mod.** This prototype edits a **copy** of an unprogressed, fresh DQIX Enhanced save so that the protagonist's current vocation is one of Warrior, Priest, Mage, Martial Artist, or Thief, instead of Minstrel.
+**Current status: real save data structurally validated; in-game behavior not yet verified.** This is a temporary save-file prototype, not the requested six-choice in-game character-creation UI.
 
-## Verified against public save format
+## Confirmed first usable save
 
-The community [DQIX editor](https://github.com/DQIX/editor) identifies:
-- two 32,768-byte slots in a 65,536-byte DQIX `.sav` file;
-- hero character array, vocation field, per-vocation level and experience;
-- CRC32 checksums for each save slot;
-- vocation IDs 1–6 for standard classes;
-- advanced vocation unlock flags at another save offset.
+The first ordinary save after the mandatory opening battle can have a level-1 Minstrel with **7 EXP**. The prototype now allows exactly 0 or 7 EXP at level 1, rather than incorrectly requiring a 0-EXP character. Five separate trial saves were generated from such a save and checked: the sole data changes in each of the two save slots are the current-vocation byte and the checksum covering it.
 
-The script intentionally only edits the hero's current vocation byte and recalculates the owning slot's checksum. It does not modify quest flags, unlock flags, equipment, or stats. Those are precisely the parts that need **in-game verification** to see whether DQIX recalculates dependent data when loading a save.
+One publicly available save-layout reference is [DQIX/editor](https://github.com/DQIX/editor), which documents the 65,536-byte save format, its two 32,768-byte slots, the vocation byte, separate per-vocation EXP and level fields, and three CRC32 regions per slot.
 
-## Safety
+## Behavior and limitations
 
-- Never writes over the input file or an existing output.
-- Requires an existing file with exact size, magic header, and valid checksums.
-- Requires an existing player character with current vocation Minstrel, at level 1, with 0 XP.
-- Requires the target vocation to be level 1 with 0 XP.
-- Does not try to change a Guardian, advanced vocation, or progressed hero.
-- Never uploads your save to GitHub.
-- This is a proof-of-concept for test saves, **not** a multiplayer-ready patch.
+- Selected vocation IDs: Warrior 1, Priest 2, Mage 3, Martial Artist 4, Thief 5. Minstrel 6 is the original baseline.
+- Keeps the mandatory battle's 7 EXP assigned to Minstrel, leaves the selected target vocation at level 1 with 0 EXP, and leaves advanced-class unlock flags alone.
+- Rewrites checksums in **both** save slots because DQIX retains two copies of save-state data.
+- Requires both slots to have usable, untouched level-1 Minstrel character records; does not work on blank new game files or progressed saves.
+- The patcher refuses overwriting input and existing output; do not place modified saves in your ordinary game installation until you have made a complete backup.
+- **Unknown:** will the game recompute HP/MP, character stats, initial equipment permissions, spells, and battle formulas correctly on load? These require an actual game test.
 
-## Command example
-
-From the root of this repository on a Windows computer with Python 3:
+## Generate a test save (developer use)
 
 ```powershell
-py -3 tools/set_starting_vocation.py "C:\\testing\\dqix.sav" mage
+py -3 tools/set_starting_vocation.py "C:\\dqix-test\\dqix.sav" warrior
 ```
 
-This creates `C:\testing\dqix-mage.sav` without changing `dqix.sav`. Never point it at a save you haven't backed up.
+The output is `dqix-warrior.sav`, distinct from the original `dqix.sav`. For testing in an **isolated** game directory, rename the output to `dqix.sav` only after saving the baseline original separately.
 
-The script defaults to normal save slot 0. Experimental `--slot 1` is possible for a quick-save slot, but only use when you know exactly which slot is active.
+## How to validate
 
-Tests (no game copy required):
+1. Make an isolated copy of the playable game folder, including `dqix.exe` and any required game files. Do not upload or publish it.
+2. Back up the isolated copy's `dqix.sav` as an offline, safe copy.
+3. Replace **only** that isolated copy's `dqix.sav` with one generated test save, renamed `dqix.sav`.
+4. Start the isolated game; inspect vocation, character details, equipment screen, available spells, and whether battle works.
+5. Save, close, reopen and confirm the new vocation persists. If this fails, restore your backup and record what happened.
+6. Repeat with other vocation variants only after one succeeds.
 
-```powershell
-py -3 -m unittest discover -s tests -p "test_starting_vocation.py" -v
-```
+**Never distribute ROMs, extracted game files, or the packaged game executable.**
 
-The Python unit tests were executed locally against **synthetic saves** (four tests passing). This does **not** establish correctness on a real game save.
-
-## Real-game acceptance test, pending
-
-1. Create a disposable brand-new hero in an isolated DQIX Enhanced game folder.
-2. Advance until the normal save is actually available, without leveling up.
-3. Back up its `dqix.sav`. Do not replace your regular save.
-4. Apply the tool to a **copy**, then load the resulting file in that isolated game folder.
-5. Check displayed class, HP/MP, spell/skill progression, equipment restrictions, level-ups, and whether the save reloads.
-6. Never share your personal ROM, copied game files, or private full save through GitHub.
-
-The requested in-game creation menu and verified class stat initialization remain future implementation tasks; changing a save afterward is not equivalent to completing those features.
+Automated synthetic-save tests are in `tests/test_starting_vocation.py`. In-game tests have not yet been run.
