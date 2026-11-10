@@ -101,8 +101,7 @@ def changes(existing):
     if "dqix_apply_start_vocation(" not in card:
         raise ValueError("Install native hook first (tools/install_native_hook.py)")
     if BEGIN in frontend:
-        if all("dqix_coop_apply_menu_start_vocation" in card and
-               ("MI_COOP_VOC0" in head),):
+        if "dqix_coop_apply_menu_start_vocation" in card and "MI_COOP_VOC0" in head:
             return {}
         raise ValueError("Incomplete prior installation; refusing to edit")
 
