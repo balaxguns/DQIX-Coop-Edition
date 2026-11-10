@@ -41,3 +41,18 @@ Upstream documents remote networking for the game's original guest/host features
 ## Implementation status
 
 Scaffolding and researched architecture only. No ROM, upstream code, compiled game, or patched logic has been checked into this repository. A playable modification still requires implementation and testing using a locally supplied game ROM.
+
+
+## Verified build-time patch mechanism
+
+Upstream `docs/TECHNICAL.md` documents `patches.txt` as instruction overrides applied by the static recompiler. The file format is:
+
+```text
+# <module> <address> <new ARM word>
+```
+
+Its existing example replaces an ARM branch instruction with a NOP in overlay 34; it is an anti-piracy memory-leak fix and **not** relevant to vocation selection. We must not modify or reuse this address.
+
+Important: a small instruction patch may work for an initialization rule, but adding a six-option character-creation interface likely requires larger changes than a single instruction override. We need to find game logic before deciding between ARM patches, a hook in translated code, or a different approach.
+
+The named symbol map at `config/usa/arm9/symbols.txt` was inspected and mostly uses generic `func_...` names, so keyword search alone cannot reliably identify the initialization point. No vocation function address has been verified yet.
