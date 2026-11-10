@@ -56,7 +56,7 @@ class TestSavePatch(unittest.TestCase):
             blank[base + mod.STANDBY_COUNT] = 255
             blank[base + mod.PARTY_COUNT] = 255
             # Blank slots commonly do not have all valid CRCs.
-            blank[base + 36:base + 40] = b'\\x00' * 4
+            blank[base + 36:base + 40] = bytes(4)
         with self.assertRaisesRegex(mod.SaveError, 'contains no started character'):
             mod.patch_save(bytes(blank), 'mage')
 
