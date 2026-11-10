@@ -51,9 +51,9 @@ def install(root, source):
     end = original.index(END_MARKER)
     if end <= start:
         raise ValueError("Unexpected backup_init function layout; no changes made")
-    # Ensure the insertion point is inside the expected function body.
-    if original[start:end].count("}") > 1:
-        raise ValueError("Unexpected backup_init structure; no changes made")
+    # The second marker must belong to backup_init, not a later function.
+    if original.find("void backup_flush(", start, end) != -1:
+        raise ValueError("Expected insertion point is outside backup_init")
     altered = original.replace(START_MARKER, PROTOTYPE + "\n" + START_MARKER, 1)
     altered = altered.replace(END_MARKER, HOOK + END_MARKER, 1)
     backup = runtime / "card.c.dqix-coop-backup"
