@@ -10,35 +10,46 @@ mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
-def fake_save():
+def fake_save(exp=7, standby=3):
     data = bytearray(65536)
     data[:len(mod.MAGIC)] = mod.MAGIC
     for slot in (0, 1):
         b = bytearray(data[slot * mod.SLOT_SIZE:(slot + 1) * mod.SLOT_SIZE])
         b[mod.SAVE_EXISTS] = 1
+        b[mod.STANDBY_COUNT] = standby
         b[mod.PARTY_COUNT] = 1
-        h = mod.CHARACTER_OFFSET
+        h = mod.CHARACTER_OFFSET + mod.CHARACTER_SIZE * standby
         b[h + mod.CURRENT_VOCATION] = 6
         for v in range(1, 7):
             b[h + mod.LEVELS + v] = 1
+        b[h + mod.EXPS + 6 * 4:h + mod.EXPS + 7 * 4] = exp.to_bytes(4, 'little')
         mod.rewrite_checksums(b)
         data[slot * mod.SLOT_SIZE:(slot + 1) * mod.SLOT_SIZE] = b
     return bytes(data)
 
 
 class TestSavePatch(unittest.TestCase):
-    def test_each_starting_vocation(self):
+    def test_each_starting_vocation_and_both_slots(self):
         original = fake_save()
         for name, idx in mod.VOCATIONS.items():
             if idx == 6:
                 continue
             altered = mod.patch_save(original, name)
-            self.assertEqual(altered[mod.CHARACTER_OFFSET + mod.CURRENT_VOCATION], idx)
-            self.assertEqual(original[mod.SLOT_SIZE:], altered[mod.SLOT_SIZE:])
-            self.assertEqual(original[:132], altered[:132])
-            self.assertTrue(mod.checksums_ok(altered[:mod.SLOT_SIZE]))
-            diffs = {i for i, (a, b) in enumerate(zip(original, altered)) if a != b}
-            self.assertTrue(diffs <= set(range(132, 136)) | {216})
+            for slot in (0, 1):
+                start = slot * mod.SLOT_SIZE
+                local_hero = mod.CHARACTER_OFFSET + 3 * mod.CHARACTER_SIZE
+                self.assertEqual(altered[start + local_hero + mod.CURRENT_VOCATION], idx)
+                self.assertTrue(mod.checksums_ok(altered[start:start + mod.SLOT_SIZE]))
+                expected_changes = set(range(start + 132, start + 136))
+                expected_changes.add(start + local_hero + mod.CURRENT_VOCATION)
+                observed_changes = {i for i in range(start, start + mod.SLOT_SIZE)
+                                    if altered[i] != original[i]}
+                self.assertTrue(observed_changes <= expected_changes)
+                self.assertEqual(int.from_bytes(altered[start + local_hero + mod.EXPS + 24:
+                                                        start + local_hero + mod.EXPS + 28], 'little'), 7)
+
+    def test_zero_exp_still_supported(self):
+        self.assertEqual(mod.patch_save(fake_save(exp=0), 'mage')[1932], 3)
 
     def test_invalid_input(self):
         with self.assertRaises(mod.SaveError):
@@ -48,13 +59,24 @@ class TestSavePatch(unittest.TestCase):
         with self.assertRaisesRegex(mod.SaveError, 'checksums'):
             mod.patch_save(broken, 'mage')
 
-    def test_not_fresh(self):
+    def test_reject_progressed(self):
         original = bytearray(fake_save())
-        original[mod.CHARACTER_OFFSET + mod.LEVELS + 6] = 2
         b = original[:mod.SLOT_SIZE]
+        h = mod.CHARACTER_OFFSET + mod.CHARACTER_SIZE * 3
+        b[h + mod.LEVELS + 6] = 2
         mod.rewrite_checksums(b)
         original[:mod.SLOT_SIZE] = b
-        with self.assertRaisesRegex(mod.SaveError, 'progressed'):
+        with self.assertRaisesRegex(mod.SaveError, 'level-1'):
+            mod.patch_save(original, 'mage')
+
+    def test_reject_mismatch_second_slot(self):
+        original = bytearray(fake_save())
+        second = bytearray(original[mod.SLOT_SIZE:])
+        h = mod.CHARACTER_OFFSET + mod.CHARACTER_SIZE * 3
+        second[h + mod.CURRENT_VOCATION] = 1
+        mod.rewrite_checksums(second)
+        original[mod.SLOT_SIZE:] = second
+        with self.assertRaisesRegex(mod.SaveError, 'Expected Minstrel'):
             mod.patch_save(original, 'mage')
 
     def test_no_accidental_overwrite(self):
